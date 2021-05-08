@@ -6,10 +6,6 @@ const router = express.Router();
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 
-router.get('/', (req, res) => {
-  res.send('Hello World!!!');
-});
-
 router.get('/todos', (req, res) => {
   fs.readFile('./data/todos.json', (err, data) => {
     const content = JSON.parse(data);
@@ -70,7 +66,7 @@ router.put('/todos/:id', (req, res) => {
       throw err;
     }
     let content = JSON.parse(data);
-    let todoIdx = content.todos.findIndex(t => t.id === +req.params.id)
+    let todoIdx = content.todos.findIndex(t => t.id === +req.params.id);
     if (todoIdx !== -1) {
       content.todos[todoIdx].isDone = !content.todos[todoIdx].isDone;
     }
@@ -99,20 +95,24 @@ router.put('/todos', (req, res) => {
   res.status(200).end();
 });
 
-router.put('/todos/:idf/:ids', (req, res) => {
+router.put('/todos/dnd/:id', (req, res) => {
   fs.readFile('./data/todos.json', (err, data) => {
     if (err) {
       throw err;
     }
     let content = JSON.parse(data);
-    let currentTodoIdx = content.todos.findIndex(t => t.id === +req.params.idf)
-    let currentTodo = content.todos.splice(currentTodoIdx, 1);
-    if (+req.params.ids) {
-      let prevTodoIdx = content.todos.findIndex(t => t.id === +req.params.ids);
-      content.todos.splice(prevTodoIdx + 1, 0, currentTodo[0]);
-    } else if (!+req.params.ids) {
-      content.todos.unshift(currentTodo[0]);
+    let todoIdx = content.todos.findIndex(t => t.id === +req.params.id);
+    if (todoIdx !== -1) {
+      content.todos[todoIdx].position = req.body[0];
     }
+    console.log('1111111111', content)
+    content.todos.sort((a,b) => {
+      if (a.position < b.position) return -1;
+      if (a.position > b.position) return 1;
+      return 0;
+    });
+    console.log('2222222222222', content)
+
     fs.writeFile('./data/todos.json', JSON.stringify(content),  (err) => {
       if (err) {
         return console.error(err);
