@@ -105,14 +105,11 @@ router.put('/todos/dnd/:id', (req, res) => {
     if (todoIdx !== -1) {
       content.todos[todoIdx].position = req.body[0];
     }
-    console.log('1111111111', content)
     content.todos.sort((a,b) => {
       if (a.position < b.position) return -1;
       if (a.position > b.position) return 1;
       return 0;
     });
-    console.log('2222222222222', content)
-
     fs.writeFile('./data/todos.json', JSON.stringify(content),  (err) => {
       if (err) {
         return console.error(err);
